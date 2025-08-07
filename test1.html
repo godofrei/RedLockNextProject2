@@ -1,115 +1,54 @@
 <!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hangi Red Lock Karaktersin?</title>
+  <title>Red Lock'a Alınır mıydın?</title>
   <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-    }
-    h1 {
-      text-align: center;
-      color: red;
-    }
-    .question {
-      margin-bottom: 2rem;
-    }
-    .options label {
-      display: block;
-      margin: 0.5rem 0;
-    }
-    button {
-      display: block;
-      margin: 2rem auto;
-      padding: 1rem 2rem;
-      background-color: red;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: darkred;
-    }
-    #result {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      font-weight: bold;
-      color: lightgreen;
-    }
+    body { background: black; color: white; font-family: Arial; text-align: center; padding: 2rem; }
+    h1 { color: crimson; }
+    button { padding: 0.7rem 2rem; margin: 1rem; font-size: 1rem; background: crimson; color: white; border: none; cursor: pointer; }
+    .question { margin: 2rem 0; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>Hangi Red Lock Karaktersin?</h1>  <form id="quizForm">
-    <div class="question">
-      <p>1. Takım mı, birey mi?</p>
-      <label><input type="radio" name="q1" value="rei"> Birey</label>
-      <label><input type="radio" name="q1" value="isagi"> Takım</label>
-    </div>
-    <div class="question">
-      <p>2. Hız mı, zeka mı?</p>
-      <label><input type="radio" name="q2" value="isagi"> Zeka</label>
-      <label><input type="radio" name="q2" value="rei"> Hız</label>
-    </div>
-    <div class="question">
-      <p>3. Planlı mısın yoksa sezgisel mi?</p>
-      <label><input type="radio" name="q3" value="isagi"> Planlı</label>
-      <label><input type="radio" name="q3" value="rei"> Sezgisel</label>
-    </div>
-    <div class="question">
-      <p>4. Liderlik mi, takipçilik mi?</p>
-      <label><input type="radio" name="q4" value="rei"> Liderlik</label>
-      <label><input type="radio" name="q4" value="isagi"> Takipçilik</label>
-    </div>
-    <div class="question">
-      <p>5. Risk alır mısın?</p>
-      <label><input type="radio" name="q5" value="rei"> Evet</label>
-      <label><input type="radio" name="q5" value="isagi"> Hayır</label>
-    </div>
-    <div class="question">
-      <p>6. Soğukkanlı mısın yoksa duygusal mı?</p>
-      <label><input type="radio" name="q6" value="isagi"> Soğukkanlı</label>
-      <label><input type="radio" name="q6" value="rei"> Duygusal</label>
-    </div>
-    <div class="question">
-      <p>7. Kaybetmek mi, hiç denememek mi?</p>
-      <label><input type="radio" name="q7" value="rei"> Kaybetmek</label>
-      <label><input type="radio" name="q7" value="isagi"> Hiç denememek</label>
-    </div>
-    <div class="question">
-      <p>8. Kuralcı mısın, kural yıkan mı?</p>
-      <label><input type="radio" name="q8" value="isagi"> Kuralcı</label>
-      <label><input type="radio" name="q8" value="rei"> Kural yıkan</label>
-    </div><button type="button" onclick="showResult()">Sonucu Göster</button>
-
-  </form>  <div id="result"></div>  <script>
-    function showResult() {
-      const form = document.getElementById('quizForm');
-      const formData = new FormData(form);
-      let rei = 0;
-      let isagi = 0;
-
-      for (let [key, value] of formData.entries()) {
-        if (value === 'rei') rei++;
-        if (value === 'isagi') isagi++;
+  <h1>Red Lock'a Alınır mıydın?</h1>
+  <div id="quiz"></div>
+  <div id="result" class="hidden"></div>
+  <script>
+    const questions = [
+      "Karar anında baskıya dayanabilir misin?",
+      "Ego senin için ne demek?",
+      "Bir pozisyonu ezberler misin, yaratır mısın?",
+      "Kendi kararına mı güvenir, başkasına mı?",
+      "İzlenmek seni motive eder mi?",
+      "Hedefin için her şeyi göze alır mısın?",
+      "Rakibini geçmenin tek yolu nedir?",
+      "Sahada görünür olmak mı, işlevsel olmak mı?"
+    ];
+    const quizEl = document.getElementById("quiz");
+    const resultEl = document.getElementById("result");
+    let score = 0, index = 0;
+    function showQuestion() {
+      if (index >= questions.length) {
+        const result = score >= 5 ? "Tebrikler, Red Lock'a alındın!" : "Üzgünüz, Red Lock kriterlerini karşılamıyorsun.";
+        quizEl.innerHTML = "";
+        resultEl.innerHTML = `<h2><span style='color:crimson'>${result}</span></h2>`;
+        resultEl.classList.remove("hidden");
+        return;
       }
-
-      let resultText = '';
-      if (rei > isagi) {
-        resultText = 'Sen bir REİ AKARİ'sin! Bireysel gücün ve sezgisel zekan seni öne çıkarıyor.';
-      } else if (isagi > rei) {
-        resultText = 'Sen bir ISAGİ'sin! Takım oyunundaki stratejik düşüncen seni eşsiz yapıyor.';
-      } else {
-        resultText = 'Hem Rei hem Isagi özelliklerini taşıyorsun. Denge senin gücün!';
-      }
-
-      document.getElementById('result').innerText = resultText;
+      quizEl.innerHTML = `
+        <div class='question'>
+          <h2>${questions[index]}</h2>
+          <button onclick='answer(1)'>A</button>
+          <button onclick='answer(0)'>B</button>
+        </div>`;
     }
-  </script></body>
+    function answer(val) {
+      if (val === 1) score++;
+      index++;
+      showQuestion();
+    }
+    showQuestion();
+  </script>
+</body>
 </html>
