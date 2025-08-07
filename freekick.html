@@ -1,45 +1,87 @@
 <!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Red Lock - Frikik Oyunu</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #000; color: white; font-family: Arial, sans-serif; overflow: hidden; text-align: center; }
-    canvas { background: url('assets/goal.png') no-repeat center center; background-size: cover; display: block; margin: 1rem auto; border: 2px solid crimson; }
-    #ui { margin-top: 1rem; }
-    select, button {
-      padding: 0.5rem 1rem;
-      margin: 0.5rem;
-      font-size: 1rem;
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
     }
-    #score, #timer { font-size: 1.2rem; margin: 0.5rem; color: crimson; }
+    h1 {
+      color: crimson;
+      margin-top: 20px;
+    }
+    canvas {
+      border: 2px solid crimson;
+      display: block;
+      margin: 20px auto;
+      background: url('https://i.imgur.com/R5QkWcS.png'); /* Kale arka planı */
+      background-size: cover;
+    }
+    #scoreboard, #timer {
+      font-size: 1.2rem;
+      margin: 10px;
+    }
+    .btn {
+      background: crimson;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #characterSelect {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>Red Lock Frikik Oyunu</h1>
-  <div id="ui">
-    <select id="player">
-      <option value="isagi">Isagi</option>
-      <option value="rin">Rin</option>
-      <option value="nagi">Nagi</option>
-    </select>
-    <button onclick="startGame()">Oyuna Başla</button>
-    <div id="score">Skor: 0</div>
-    <div id="timer">Zaman: 30</div>
+  <h1>Red Lock - Frikik Oyunu</h1>
+  <div id="characterSelect">
+    <p>Karakterini Seç:</p>
+    <button class="btn" onclick="selectCharacter('Isagi')">Isagi</button>
+    <button class="btn" onclick="selectCharacter('Rin')">Rin</button>
+    <button class="btn" onclick="selectCharacter('Nagi')">Nagi</button>
   </div>
-  <canvas id="gameCanvas" width="360" height="500"></canvas>  <script>
+  <div id="scoreboard">Skor: 0</div>
+  <div id="timer">Süre: 30</div>
+  <canvas id="gameCanvas" width="400" height="500"></canvas>  <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    let ball = { x: 180, y: 460, radius: 10, dx: 0, dy: 0, moving: false };
     let score = 0;
-    let time = 30;
-    let gameInterval, timerInterval;
-    const targetZones = [
-      { x: 60, y: 50, r: 20 },
-      { x: 180, y: 30, r: 20 },
-      { x: 300, y: 50, r: 20 }
+    let timeLeft = 30;
+    let interval;
+    let character = null;
+
+    const ball = { x: 180, y: 450, radius: 10, dx: 0, dy: 0 };
+    const targets = [
+      { x: 150, y: 50, r: 20 },
+      { x: 300, y: 100, r: 20 },
+      { x: 80, y: 80, r: 20 }
     ];
-    let selectedPlayer = "isagi";
+
+    function selectCharacter(name) {
+      character = name;
+      document.getElementById("characterSelect").style.display = "none";
+      startGame();
+    }
+
+    function startGame() {
+      interval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = `Süre: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          alert("Süre doldu! Skor: " + score);
+        }
+      }, 1000);
+      draw();
+    }
 
     function drawBall() {
       ctx.beginPath();
@@ -50,78 +92,65 @@
     }
 
     function drawTargets() {
-      for (let target of targetZones) {
+      targets.forEach(t => {
         ctx.beginPath();
-        ctx.arc(target.x, target.y, target.r, 0, Math.PI * 2);
-        ctx.strokeStyle = "crimson";
-        ctx.lineWidth = 3;
-        ctx.stroke();
+        ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+        ctx.fillStyle = "yellow";
+        ctx.fill();
         ctx.closePath();
-      }
+      });
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawBall();
       drawTargets();
+      moveBall();
+      requestAnimationFrame(draw);
     }
 
-    function update() {
-      if (ball.moving) {
-        ball.x += ball.dx;
-        ball.y += ball.dy;
-        // Check for goal
-        for (let target of targetZones) {
-          const dist = Math.hypot(ball.x - target.x, ball.y - target.y);
-          if (dist < ball.radius + target.r) {
-            score++;
-            document.getElementById("score").innerText = `Skor: ${score}`;
-            resetBall();
-            return;
-          }
-        }
-        if (ball.y < 0 || ball.x < 0 || ball.x > canvas.width) {
+    function moveBall() {
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+
+      targets.forEach((t, i) => {
+        const dist = Math.hypot(ball.x - t.x, ball.y - t.y);
+        if (dist < ball.radius + t.r) {
+          score++;
+          targets.splice(i, 1);
+          document.getElementById("scoreboard").innerText = `Skor: ${score}`;
           resetBall();
         }
+      });
+
+      if (ball.y < 0 || ball.x < 0 || ball.x > canvas.width) {
+        resetBall();
       }
-      draw();
     }
 
     function resetBall() {
-      ball = { x: 180, y: 460, radius: 10, dx: 0, dy: 0, moving: false };
+      ball.x = 180;
+      ball.y = 450;
+      ball.dx = 0;
+      ball.dy = 0;
     }
 
-    function shootBall() {
-      if (ball.moving) return;
-      let power = selectedPlayer === "rin" ? -10 : selectedPlayer === "nagi" ? -8 : -9;
-      let curve = selectedPlayer === "isagi" ? 0 : selectedPlayer === "rin" ? (Math.random() * 4 - 2) : (Math.random() * 6 - 3);
-      ball.dy = power;
-      ball.dx = curve;
-      ball.moving = true;
-    }
+    canvas.addEventListener("click", function(e) {
+      if (!character) return;
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      let power = 5;
+      let curve = 0;
 
-    function startGame() {
-      selectedPlayer = document.getElementById("player").value;
-      score = 0;
-      time = 30;
-      document.getElementById("score").innerText = `Skor: ${score}`;
-      document.getElementById("timer").innerText = `Zaman: ${time}`;
-      resetBall();
-      clearInterval(gameInterval);
-      clearInterval(timerInterval);
-      gameInterval = setInterval(update, 30);
-      timerInterval = setInterval(() => {
-        time--;
-        document.getElementById("timer").innerText = `Zaman: ${time}`;
-        if (time <= 0) {
-          clearInterval(gameInterval);
-          clearInterval(timerInterval);
-          alert("Süre doldu! Skorunuz: " + score);
-        }
-      }, 1000);
-    }
+      if (character === "Isagi") { power = 6; curve = 0.5; }
+      else if (character === "Rin") { power = 7; curve = -0.3; }
+      else if (character === "Nagi") { power = 5.5; curve = 0.8; }
 
-    canvas.addEventListener("click", shootBall);
-    draw();
+      const angle = Math.atan2(ball.y - clickY, clickX - ball.x);
+      ball.dx = power * Math.cos(angle) + curve;
+      ball.dy = -power * Math.sin(angle);
+    });
   </script></body>
 </html>
+
