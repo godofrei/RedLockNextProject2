@@ -1,77 +1,42 @@
-<!DOCTYPE html>
-<html lang="tr">
+<!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>RED LOCK - Giriş</title>
+  <title>Red Lock</title>
   <style>
     body {
-      margin: 0;
-      height: 100vh;
       background: black;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      color: white;
       font-family: Arial, sans-serif;
-      color: white;
       text-align: center;
+      padding-top: 100px;
     }
-
     h1 {
-      font-size: 3rem;
+      color: crimson;
+      font-size: 48px;
       font-weight: bold;
-      color: white;
-      text-shadow: 2px 2px crimson;
-      margin-bottom: 0.5rem;
     }
-
-    h2 {
-      font-weight: bold;
-      font-size: 1.3rem;
+    p {
+      font-size: 18px;
       color: white;
-      margin-bottom: 2rem;
     }
-
-    .btn {
-      background: crimson;
+    .button {
+      margin: 20px;
+      padding: 15px 30px;
+      background-color: crimson;
       color: white;
-      padding: 1rem 2rem;
-      margin: 0.5rem;
       border: none;
-      font-size: 1rem;
+      font-size: 18px;
       cursor: pointer;
-      font-weight: bold;
       transition: 0.3s;
     }
-
-    .btn:hover {
-      background: darkred;
-    }
-
-    .lightning {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-image: radial-gradient(crimson 2px, transparent 2px);
-      background-size: 20px 20px;
-      animation: flicker 1s infinite;
-      z-index: -1;
-      opacity: 0.1;
-    }
-
-    @keyframes flicker {
-      0%, 100% { opacity: 0.1; }
-      50% { opacity: 0.3; }
+    .button:hover {
+      background-color: darkred;
     }
   </style>
 </head>
 <body>
-  <div class="lightning"></div>
   <h1>RED LOCK'A HOŞGELDİNİZ</h1>
-  <h2>"Egoist olmak sadece kendini beğenmişlik değildir."</h2>
+  <p><em>"EGOİST OLMAK SADECE KENDİNİ BEĞENMİŞLİK DEĞİLDİR."</em></p>  <!-- Butonlar --><a href="hikaye_1.html"><button class="button">Okumaya Başla</button></a> <a href="redlock_1v1_mini_oyun.html"><button class="button">Mini Oyunu Oyna</button></a>
 
-  <button class="btn" onclick="window.location.href='bolum1.html'">Okumaya Başla</button>
-  <button class="btn" onclick="window.location.href='free-kick.html'">Mini Oyun Oyna</button>
 </body>
 </html>
