@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangi Karakterin Fanısın?</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: crimson;
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    .options label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+    button {
+      display: block;
+      margin: 2rem auto;
+      padding: 1rem 2rem;
+      background-color: crimson;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: darkred;
+    }
+    #result {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      font-weight: bold;
+      color: lightblue;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hangi Karakterin Fanısın?</h1>  <form id="quizForm">
+    <div class="question">
+      <p>1. Karizma mı, strateji mi etkiler seni?</p>
+      <label><input type="radio" name="q1" value="rei"> Karizma</label>
+      <label><input type="radio" name="q1" value="isagi"> Strateji</label>
+    </div>
+    <div class="question">
+      <p>2. Sessiz lider mi, konuşkan lider mi?</p>
+      <label><input type="radio" name="q2" value="isagi"> Sessiz</label>
+      <label><input type="radio" name="q2" value="rei"> Konuşkan</label>
+    </div>
+    <div class="question">
+      <p>3. Maç kazandıran mı, seyir zevki veren mi?</p>
+      <label><input type="radio" name="q3" value="rei"> Seyir zevki</label>
+      <label><input type="radio" name="q3" value="isagi"> Maç kazandıran</label>
+    </div>
+    <div class="question">
+      <p>4. Hırs mı, sadakat mi?</p>
+      <label><input type="radio" name="q4" value="rei"> Hırs</label>
+      <label><input type="radio" name="q4" value="isagi"> Sadakat</label>
+    </div>
+    <div class="question">
+      <p>5. Agresif oyun mu, sakin oyun mu?</p>
+      <label><input type="radio" name="q5" value="rei"> Agresif</label>
+      <label><input type="radio" name="q5" value="isagi"> Sakin</label>
+    </div>
+    <div class="question">
+      <p>6. Kendine güvenen mi, özverili mi?</p>
+      <label><input type="radio" name="q6" value="rei"> Kendine güvenen</label>
+      <label><input type="radio" name="q6" value="isagi"> Özverili</label>
+    </div>
+    <div class="question">
+      <p>7. İlk izlenim mi, uzun vadeli etki mi?</p>
+      <label><input type="radio" name="q7" value="rei"> İlk izlenim</label>
+      <label><input type="radio" name="q7" value="isagi"> Uzun vadeli etki</label>
+    </div>
+    <div class="question">
+      <p>8. Parlak yetenek mi, disiplinli oyuncu mu?</p>
+      <label><input type="radio" name="q8" value="rei"> Parlak yetenek</label>
+      <label><input type="radio" name="q8" value="isagi"> Disiplinli</label>
+    </div><button type="button" onclick="showResult()">Sonucu Göster</button>
+
+  </form>  <div id="result"></div>  <script>
+    function showResult() {
+      const form = document.getElementById('quizForm');
+      const formData = new FormData(form);
+      let rei = 0;
+      let isagi = 0;
+
+      for (let [key, value] of formData.entries()) {
+        if (value === 'rei') rei++;
+        if (value === 'isagi') isagi++;
+      }
+
+      let resultText = '';
+      if (rei > isagi) {
+        resultText = 'Senin favori karakterin kesinlikle REİ AKARİ! Enerjisiyle herkesi büyülüyor.';
+      } else if (isagi > rei) {
+        resultText = 'Senin favori karakterin ISAGİ! Zekası ve sabrı seni etkiliyor.';
+      } else {
+        resultText = 'İki karaktere de hayransın! Karar verememiş olman çok normal.';
+      }
+
+      document.getElementById('result').innerText = resultText;
+    }
+  </script></body>
+</html>
