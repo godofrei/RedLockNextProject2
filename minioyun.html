@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Red Lock Free Kick</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 1rem;
+      color: crimson;
+    }
+    .controls {
+      margin: 1rem;
+    }
+    select, button {
+      padding: 0.5rem 1rem;
+      margin: 0.5rem;
+      font-size: 1rem;
+    }
+    canvas {
+      background: #222;
+      display: block;
+      margin: 0 auto;
+      border: 2px solid crimson;
+    }
+    #score {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Red Lock Free Kick</h1>
+  <div class="controls">
+    <label for="player">Karakter Seç:</label>
+    <select id="player">
+      <option value="rei">Rei Akarı (Güçlü)</option>
+      <option value="isagi">Isagi (İsabetli)</option>
+      <option value="nagi">Nagi (Dengeli)</option>
+    </select>
+    <p>Kaleye tıklayarak şut yönünü ve gücünü ayarla</p>
+  </div>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+  <div id="score">Goller: 0 / Denemeler: 0</div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const playerSelect = document.getElementById('player');
+
+    const goal = { x: 200, y: 50, width: 200, height: 20 };
+    const ball = { x: 300, y: 370, radius: 10 };
+
+    let shots = 0, goals = 0;
+
+    const characters = {
+      rei: { power: 1.5, accuracy: 0.3 },
+      isagi: { power: 1.1, accuracy: 0.1 },
+      nagi: { power: 1.3, accuracy: 0.2 }
+    };
+
+    function drawScene(ballX = ball.x, ballY = ball.y, showBall = true) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Kale
+      ctx.fillStyle = 'white';
+      ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+
+      // Kaleci (random pozisyon)
+      const keeperPos = ['left', 'center', 'right'][Math.floor(Math.random() * 3)];
+      let keeperX;
+      if (keeperPos === 'left') keeperX = goal.x + 20;
+      else if (keeperPos === 'center') keeperX = goal.x + goal.width / 2 - 10;
+      else keeperX = goal.x + goal.width - 40;
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(keeperX, goal.y - 20, 20, 20);
+
+      // Top
+      if (showBall) {
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'crimson';
+        ctx.fill();
+      }
+
+      return keeperX;
+    }
+
+    function updateScore() {
+      scoreEl.textContent = `Goller: ${goals} / Denemeler: ${shots}`;
+    }
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      const selected = playerSelect.value;
+      const char = characters[selected];
+
+      shots++;
+
+      // Hesapla yön ve mesafe
+      const dx = clickX - ball.x;
+      const dy = clickY - ball.y;
+
+      // Şut sapması (accuracy)
+      const accX = dx + (Math.random() - 0.5) * char.accuracy * 300;
+      const accY = dy + (Math.random() - 0.5) * char.accuracy * 100;
+
+      const targetX = ball.x + accX * char.power;
+      const targetY = ball.y + accY * char.power;
+
+      const keeperX = drawScene(targetX, targetY);
+
+      // Gol kontrol
+      const isGoal =
+        targetX > goal.x &&
+        targetX < goal.x + goal.width &&
+        targetY < goal.y + goal.height &&
+        !(targetX > keeperX && targetX < keeperX + 20);
+
+      if (isGoal) goals++;
+
+      setTimeout(() => {
+        drawScene();
+        updateScore();
+      }, 600);
+    });
+
+    drawScene();
+    updateScore();
+  </script>
+</body>
+</html>
