@@ -1,108 +1,74 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>REDLOCKNEWPROJECT2</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Lock</title>
   <style>
-    * {
+    body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    body, html {
-      height: 100%;
-      font-family: 'Arial Black', sans-serif;
-      background-color: black;
-      overflow: hidden;
-    }
-
-    .background {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background-color: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: flash 2s infinite;
-    }
-
-    .overlay {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-image: radial-gradient(red 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.1;
-    }
-
-    .content {
-      position: relative;
-      z-index: 1;
-      text-align: center;
+      background: black;
       color: white;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-image: radial-gradient(circle at center, black 60%, crimson 100%);
+      animation: lightning 2s infinite;
+    }
+
+    @keyframes lightning {
+      0%, 100% { background-color: black; }
+      50% { background-color: crimson; }
     }
 
     h1 {
       font-size: 3rem;
       font-weight: bold;
       color: white;
-      margin-bottom: 1rem;
+      text-align: center;
     }
 
-    .slogan {
-      font-size: 1.2rem;
-      font-weight: bold;
+    h2 {
+      font-size: 1.5rem;
+      font-style: italic;
       color: white;
-      margin-bottom: 2rem;
+      text-align: center;
+      margin-top: 1rem;
     }
 
     .buttons {
+      margin-top: 2rem;
       display: flex;
       gap: 1rem;
-      justify-content: center;
     }
 
-    .btn {
-      padding: 1rem 2rem;
-      background-color: red;
-      border: none;
+    .buttons a {
+      background-color: crimson;
       color: white;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
       text-decoration: none;
-      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 5px;
+      transition: background 0.3s;
     }
 
-    .btn:hover {
+    .buttons a:hover {
       background-color: darkred;
-    }
-
-    @keyframes flash {
-      0%, 100% {
-        box-shadow: 0 0 30px red;
-      }
-      50% {
-        box-shadow: 0 0 60px crimson;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="background">
-    <div class="overlay"></div>
-    <div class="content">
-      <h1>RED LOCK'A HOŞ GELDİNİZ</h1>
-      <p class="slogan">"EGOİST OLMAK SADECE KENDİNİ BEĞENMEK DEĞİLDİR."</p>
-      <div class="buttons">
-        <button class="btn" disabled>Teste Başla</button>
-        <a href="bolum1.html" class="btn">Okumaya Başla</a>
-      </div>
-    </div>
+  <h1>RED LOCK'A HOŞ GELDİNİZ</h1>
+  <h2>\"Egoist olmak sadece kendini beğenmek değildir.\"</h2>
+
+  <div class="buttons">
+    <a href="karaktersin.html">Teste Başla</a>
+    <a href="bolum1.html">Okumaya Başla</a>
   </div>
 </body>
 </html>
