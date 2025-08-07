@@ -1,115 +1,56 @@
 <!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Red Lock'a Alınır mıydın?</title>
+  <title>Hangi Ego Tipisin?</title>
   <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-    }
-    h1 {
-      text-align: center;
-      color: crimson;
-    }
-    .question {
-      margin-bottom: 2rem;
-    }
-    .options label {
-      display: block;
-      margin: 0.5rem 0;
-    }
-    button {
-      display: block;
-      margin: 2rem auto;
-      padding: 1rem 2rem;
-      background-color: crimson;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: darkred;
-    }
-    #result {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      font-weight: bold;
-      color: lightgreen;
-    }
+    body { background: black; color: white; font-family: Arial; text-align: center; padding: 2rem; }
+    h1 { color: crimson; }
+    button { padding: 0.7rem 2rem; margin: 1rem; font-size: 1rem; background: crimson; color: white; border: none; cursor: pointer; }
+    .question { margin: 2rem 0; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>Red Lock'a Alınır mıydın?</h1>  <form id="quizForm">
-    <div class="question">
-      <p>1. Her gün yeteneklerini geliştirmek için saatlerce çalışır mısın?</p>
-      <label><input type="radio" name="q1" value="evet"> Evet</label>
-      <label><input type="radio" name="q1" value="hayir"> Hayır</label>
-    </div>
-    <div class="question">
-      <p>2. Maçta kaybettiğinde sorumluluğu kabul eder misin?</p>
-      <label><input type="radio" name="q2" value="evet"> Evet</label>
-      <label><input type="radio" name="q2" value="hayir"> Hayır</label>
-    </div>
-    <div class="question">
-      <p>3. Egoistlik senin için bir avantaj mı?</p>
-      <label><input type="radio" name="q3" value="evet"> Evet</label>
-      <label><input type="radio" name="q3" value="hayir"> Hayır</label>
-    </div>
-    <div class="question">
-      <p>4. Takım için kendinden vazgeçer misin?</p>
-      <label><input type="radio" name="q4" value="hayir"> Hayır</label>
-      <label><input type="radio" name="q4" value="evet"> Evet</label>
-    </div>
-    <div class="question">
-      <p>5. Rakibini alt etmek için zayıf yönlerini araştırır mısın?</p>
-      <label><input type="radio" name="q5" value="evet"> Evet</label>
-      <label><input type="radio" name="q5" value="hayir"> Hayır</label>
-    </div>
-    <div class="question">
-      <p>6. Bencil olman gerektiğini düşündüğün zamanlar olur mu?</p>
-      <label><input type="radio" name="q6" value="evet"> Evet</label>
-      <label><input type="radio" name="q6" value="hayir"> Hayır</label>
-    </div>
-    <div class="question">
-      <p>7. Baskı altında performans gösterebilir misin?</p>
-      <label><input type="radio" name="q7" value="evet"> Evet</label>
-      <label><input type="radio" name="q7" value="hayir"> Hayır</label>
-    </div>
-    <div class="question">
-      <p>8. Red Lock seni çağırsa aileni, arkadaşlarını geride bırakır mısın?</p>
-      <label><input type="radio" name="q8" value="evet"> Evet</label>
-      <label><input type="radio" name="q8" value="hayir"> Hayır</label>
-    </div><button type="button" onclick="showResult()">Sonucu Göster</button>
-
-  </form>  <div id="result"></div>  <script>
-    function showResult() {
-      const form = document.getElementById('quizForm');
-      const formData = new FormData(form);
-      let evet = 0;
-      let hayir = 0;
-
-      for (let [key, value] of formData.entries()) {
-        if (value === 'evet') evet++;
-        if (value === 'hayir') hayir++;
+  <h1>Hangi Ego Tipisin?</h1>
+  <div id="quiz"></div>
+  <div id="result" class="hidden"></div>
+  <script>
+    const questions = [
+      "Kendini kanıtlamak mı, rakibini ezmek mi?",
+      "Kazanmak mı, hatırlanmak mı?",
+      "Her şeyi bilen mi, her şeyi sorgulayan mı?",
+      "Seninle yarışan biri varsa onu yenmen gerekir mi?",
+      "Sessiz iddia mı, açık iddia mı?",
+      "Başarıyı paylaşır mısın, sahiplenir misin?",
+      "Güven vermek mi, korku salmak mı?",
+      "Gurur duyulacak biri mi, korkulacak biri mi olmak istersin?"
+    ];
+    let score = 0, index = 0;
+    const quizEl = document.getElementById("quiz");
+    const resultEl = document.getElementById("result");
+    function showQuestion() {
+      if (index >= questions.length) {
+        let type = "Dengeli Ego";
+        if (score >= 6) type = "Baskın ve Saldırgan Ego";
+        else if (score <= 2) type = "Sessiz ama Derin Ego";
+        quizEl.innerHTML = "";
+        resultEl.innerHTML = `<h2>Senin ego tipin: <span style='color:crimson'>${type}</span></h2>`;
+        resultEl.classList.remove("hidden");
+        return;
       }
-
-      let resultText = '';
-      if (evet >= 6) {
-        resultText = 'Tebrikler! Red Lock sistemine kabul edilirdin. Egosu yüksek bir yıldız adayı sensin!';
-      } else if (evet >= 4) {
-        resultText = 'Red Lock için potansiyelin var ama daha çalışman gerekiyor.';
-      } else {
-        resultText = 'Üzgünüm... Bu sistem senin gibi biri için fazla acımasız.';
-      }
-
-      document.getElementById('result').innerText = resultText;
+      quizEl.innerHTML = `
+        <div class='question'>
+          <h2>${questions[index]}</h2>
+          <button onclick='answer(1)'>A</button>
+          <button onclick='answer(0)'>B</button>
+        </div>`;
     }
-  </script></body>
+    function answer(val) {
+      if (val === 1) score++;
+      index++;
+      showQuestion();
+    }
+    showQuestion();
+  </script>
+</body>
 </html>
