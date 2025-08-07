@@ -1,48 +1,76 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>RED LOCK - Yeni Proje</title>
+  <meta charset="UTF-8" />
+  <title>RED LOCK - Giriş</title>
   <style>
     body {
+      margin: 0;
+      height: 100vh;
       background: black;
-      color: white;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       font-family: Arial, sans-serif;
+      color: white;
       text-align: center;
-      padding-top: 20vh;
     }
+
     h1 {
       font-size: 3rem;
       font-weight: bold;
       color: white;
-      text-shadow: 0 0 20px crimson;
+      text-shadow: 2px 2px crimson;
+      margin-bottom: 0.5rem;
     }
-    p {
-      font-size: 1.2rem;
-      font-style: italic;
+
+    h2 {
+      font-weight: bold;
+      font-size: 1.3rem;
       color: white;
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
     }
+
     .btn {
-      background-color: crimson;
+      background: crimson;
       color: white;
-      border: none;
       padding: 1rem 2rem;
+      margin: 0.5rem;
+      border: none;
       font-size: 1rem;
       cursor: pointer;
-      margin: 0.5rem;
-      transition: background 0.3s;
+      font-weight: bold;
+      transition: 0.3s;
     }
+
     .btn:hover {
-      background-color: darkred;
+      background: darkred;
+    }
+
+    .lightning {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(crimson 2px, transparent 2px);
+      background-size: 20px 20px;
+      animation: flicker 1s infinite;
+      z-index: -1;
+      opacity: 0.1;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.3; }
     }
   </style>
 </head>
 <body>
-  <h1>RED LOCK'A HOŞ GELDİNİZ</h1>
-  <p><strong>"Egoist olmak sadece kendini beğenmek değildir."</strong></p>
-  
-  <!-- Sadece okuma butonu kaldı -->
-  <button class="btn" onclick="location.href='bolum1.html'">Okumaya Başla</button>
+  <div class="lightning"></div>
+  <h1>RED LOCK'A HOŞGELDİNİZ</h1>
+  <h2>"EGOİST OLMAK SADECE KENDİNİ BEĞENMİŞLİK DEĞİLDİR"</h2>
+  <button class="btn" onclick="window.location.href='bolum1.html'">Okumaya Başla</button>
+  <button class="btn" onclick="window.location.href='free-kick.html'">Mini Oyun Oyna</button>
 </body>
 </html>
