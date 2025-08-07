@@ -1,115 +1,56 @@
 <!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hangi Karakterin Fanısın?</title>
+  <title>Egon Red Lock İçin Yeterli mi?</title>
   <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-    }
-    h1 {
-      text-align: center;
-      color: crimson;
-    }
-    .question {
-      margin-bottom: 2rem;
-    }
-    .options label {
-      display: block;
-      margin: 0.5rem 0;
-    }
-    button {
-      display: block;
-      margin: 2rem auto;
-      padding: 1rem 2rem;
-      background-color: crimson;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: darkred;
-    }
-    #result {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      font-weight: bold;
-      color: lightblue;
-    }
+    body { background: black; color: white; font-family: Arial; text-align: center; padding: 2rem; }
+    h1 { color: crimson; }
+    button { padding: 0.7rem 2rem; margin: 1rem; font-size: 1rem; background: crimson; color: white; border: none; cursor: pointer; }
+    .question { margin: 2rem 0; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>Hangi Karakterin Fanısın?</h1>  <form id="quizForm">
-    <div class="question">
-      <p>1. Karizma mı, strateji mi etkiler seni?</p>
-      <label><input type="radio" name="q1" value="rei"> Karizma</label>
-      <label><input type="radio" name="q1" value="isagi"> Strateji</label>
-    </div>
-    <div class="question">
-      <p>2. Sessiz lider mi, konuşkan lider mi?</p>
-      <label><input type="radio" name="q2" value="isagi"> Sessiz</label>
-      <label><input type="radio" name="q2" value="rei"> Konuşkan</label>
-    </div>
-    <div class="question">
-      <p>3. Maç kazandıran mı, seyir zevki veren mi?</p>
-      <label><input type="radio" name="q3" value="rei"> Seyir zevki</label>
-      <label><input type="radio" name="q3" value="isagi"> Maç kazandıran</label>
-    </div>
-    <div class="question">
-      <p>4. Hırs mı, sadakat mi?</p>
-      <label><input type="radio" name="q4" value="rei"> Hırs</label>
-      <label><input type="radio" name="q4" value="isagi"> Sadakat</label>
-    </div>
-    <div class="question">
-      <p>5. Agresif oyun mu, sakin oyun mu?</p>
-      <label><input type="radio" name="q5" value="rei"> Agresif</label>
-      <label><input type="radio" name="q5" value="isagi"> Sakin</label>
-    </div>
-    <div class="question">
-      <p>6. Kendine güvenen mi, özverili mi?</p>
-      <label><input type="radio" name="q6" value="rei"> Kendine güvenen</label>
-      <label><input type="radio" name="q6" value="isagi"> Özverili</label>
-    </div>
-    <div class="question">
-      <p>7. İlk izlenim mi, uzun vadeli etki mi?</p>
-      <label><input type="radio" name="q7" value="rei"> İlk izlenim</label>
-      <label><input type="radio" name="q7" value="isagi"> Uzun vadeli etki</label>
-    </div>
-    <div class="question">
-      <p>8. Parlak yetenek mi, disiplinli oyuncu mu?</p>
-      <label><input type="radio" name="q8" value="rei"> Parlak yetenek</label>
-      <label><input type="radio" name="q8" value="isagi"> Disiplinli</label>
-    </div><button type="button" onclick="showResult()">Sonucu Göster</button>
-
-  </form>  <div id="result"></div>  <script>
-    function showResult() {
-      const form = document.getElementById('quizForm');
-      const formData = new FormData(form);
-      let rei = 0;
-      let isagi = 0;
-
-      for (let [key, value] of formData.entries()) {
-        if (value === 'rei') rei++;
-        if (value === 'isagi') isagi++;
+  <h1>Egon Red Lock İçin Yeterli mi?</h1>
+  <div id="quiz"></div>
+  <div id="result" class="hidden"></div>
+  <script>
+    const questions = [
+      "En iyi olduğuna gerçekten inanıyor musun?",
+      "Takımındakilerden daha mı değerlisin?",
+      "Kazandığında bu senin başarın mı, takımın mı?",
+      "Hataları başkalarına mı, kendine mi yüklersin?",
+      "Top ayağındaysa, kimseye güvenmen gerekmez mi?",
+      "Daha iyisi var mı, yoksa zaten zirvede misin?",
+      "Sahaya çıktığında herkesin seni izlemesini ister misin?",
+      "Yalnızca kazanmak mı, yoksa farkla kazanmak mı?"
+    ];
+    const quizEl = document.getElementById("quiz");
+    const resultEl = document.getElementById("result");
+    let score = 0, index = 0;
+    function showQuestion() {
+      if (index >= questions.length) {
+        const result = score >= 5
+          ? "Egon seni Red Lock'un en tepesine taşır. Hazırsın!"
+          : "Egon yeterli değil. Red Lock'a girmek için daha fazlası gerek.";
+        quizEl.innerHTML = "";
+        resultEl.innerHTML = `<h2><span style='color:crimson'>${result}</span></h2>`;
+        resultEl.classList.remove("hidden");
+        return;
       }
-
-      let resultText = '';
-      if (rei > isagi) {
-        resultText = 'Senin favori karakterin kesinlikle REİ AKARİ! Enerjisiyle herkesi büyülüyor.';
-      } else if (isagi > rei) {
-        resultText = 'Senin favori karakterin ISAGİ! Zekası ve sabrı seni etkiliyor.';
-      } else {
-        resultText = 'İki karaktere de hayransın! Karar verememiş olman çok normal.';
-      }
-
-      document.getElementById('result').innerText = resultText;
+      quizEl.innerHTML = `
+        <div class='question'>
+          <h2>${questions[index]}</h2>
+          <button onclick='answer(1)'>A</button>
+          <button onclick='answer(0)'>B</button>
+        </div>`;
     }
-  </script></body>
+    function answer(val) {
+      if (val === 1) score++;
+      index++;
+      showQuestion();
+    }
+    showQuestion();
+  </script>
+</body>
 </html>
