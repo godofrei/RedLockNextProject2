@@ -1,55 +1,133 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>RED LOCK'A HOŞGELDİNİZ</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    .container {
-      padding-top: 15vh;
-    }
-    h1 {
-      font-size: 3em;
-      font-weight: bold;
-      color: white;
-    }
-    h2 {
-      font-size: 1.5em;
-      margin-bottom: 50px;
-      color: white;
-    }
-    .button {
-      background-color: crimson;
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin: 1rem;
-      cursor: pointer;
-    }
-    .button:hover {
-      background-color: darkred;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Red Lock Kapak & Mini Oyun</title>
+<style>
+  body { margin: 0; font-family: Arial, sans-serif; background: black; color: white; text-align: center; }
+  h1 { color: crimson; margin-top: 50px; }
+  .button { padding: 1rem 2rem; margin: 1rem; font-size: 1.2rem; background: crimson; border: none; color: white; cursor: pointer; }
+  #gameCanvas { background: linear-gradient(green, darkgreen); display: none; margin: auto; }
+  #timer, #score { font-size: 1.2rem; margin: 0.5rem; }
+  .hidden { display: none; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>RED LOCK'A HOŞGELDİNİZ</h1>
-    <h2><i>"Egoist olmak sadece kendini beğenmişlik değildir."</i></h2>
-    <a href="hikaye_1.html">
-      <button class="button">Okumaya Başla</button>
-    </a>
-    <a href="redlock1v1minioyun.html">
-      <button class="button">Mini Oyunu Oyna</button>
-    </a>
-  </div>
+
+<!-- Kapak ekranı -->
+<div id="kapakEkrani">
+  <h1>RED LOCK'A HOŞGELDİNİZ</h1>
+  <p>"EGOİST OLMAK SADECE KENDİNİ BEĞENMİŞLİK DEĞİLDİR"</p>
+  <button class="button" onclick="alert('Okuma sayfasına gidecek!')">Okumaya Başla</button>
+  <button class="button" onclick="baslaKarakterSecimi()">Mini Oyun Oyna</button>
+</div>
+
+<!-- Karakter seçimi -->
+<div id="karakterSecimi" class="hidden">
+  <h2>Karakterini Seç</h2>
+  <button class="button" onclick="oyunuBaslat('Rei','blue')">Rei</button>
+  <button class="button" onclick="oyunuBaslat('Nagi','yellow')">Nagi</button>
+  <button class="button" onclick="oyunuBaslat('Bachira','orange')">Bachira</button>
+  <button class="button" onclick="oyunuBaslat('Rin','purple')">Rin</button>
+</div>
+
+<!-- Oyun -->
+<canvas id="gameCanvas" width="800" height="500"></canvas>
+<div id="hud" class="hidden">
+  <span id="timer">Süre: 1:30</span> | <span id="score">Goller: 0</span>
+</div>
+
+<script>
+let ctx, canvas, player, ball, opponent, keys = {}, score = 0, timeLeft = 90, gameInterval;
+
+function baslaKarakterSecimi(){
+  document.getElementById("kapakEkrani").classList.add("hidden");
+  document.getElementById("karakterSecimi").classList.remove("hidden");
+}
+
+function oyunuBaslat(karakterAdi, renk){
+  document.getElementById("karakterSecimi").classList.add("hidden");
+  document.getElementById("gameCanvas").style.display = "block";
+  document.getElementById("hud").classList.remove("hidden");
+  
+  canvas = document.getElementById("gameCanvas");
+  ctx = canvas.getContext("2d");
+  
+  player = { x: 100, y: 200, size: 20, color: renk, name: karakterAdi };
+  ball = { x: 120, y: 220, size: 10, dx: 0, dy: 0 };
+  opponent = { x: 650, y: 200, size: 20, color: "red", name: "Isagi" };
+  
+  score = 0; timeLeft = 90;
+  
+  document.addEventListener("keydown", e => keys[e.key] = true);
+  document.addEventListener("keyup", e => keys[e.key] = false);
+  
+  gameInterval = setInterval(update, 1000/60);
+  setInterval(()=>{ 
+    if(timeLeft > 0) timeLeft--; 
+    else endGame(false);
+  }, 1000);
+}
+
+function update(){
+  // Hareket
+  if(keys["w"]) player.y -= 3;
+  if(keys["s"]) player.y += 3;
+  if(keys["a"]) player.x -= 3;
+  if(keys["d"]) player.x += 3;
+  
+  // Şut
+  if(keys[" "]) { ball.dx = 5; ball.dy = 0; }
+  
+  // Top hareketi
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+  
+  // Top sınırdan çıkarsa reset
+  if(ball.x > canvas.width){
+    score++;
+    if(score >= 10) endGame(true);
+    ball = { x: player.x+20, y: player.y, size: 10, dx: 0, dy: 0 };
+  }
+  
+  // Rakip otomatik hareket
+  if(opponent.y < ball.y) opponent.y += 2;
+  if(opponent.y > ball.y) opponent.y -= 2;
+  
+  // Rakip topu keserse
+  if(collision(ball, opponent)){
+    ball.dx = -3;
+  }
+  
+  // Çizimler
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.size, player.size);
+  
+  ctx.fillStyle = opponent.color;
+  ctx.fillRect(opponent.x, opponent.y, opponent.size, opponent.size);
+  
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI*2);
+  ctx.fill();
+  
+  document.getElementById("score").innerText = "Goller: " + score;
+  document.getElementById("timer").innerText = "Süre: " + Math.floor(timeLeft/60) + ":" + (timeLeft%60).toString().padStart(2,"0");
+}
+
+function collision(obj1, obj2){
+  return obj1.x < obj2.x + obj2.size &&
+         obj1.x + obj1.size > obj2.x &&
+         obj1.y < obj2.y + obj2.size &&
+         obj1.y + obj1.size > obj2.y;
+}
+
+function endGame(win){
+  clearInterval(gameInterval);
+  alert(win ? "Kazandın! Red Lock seni seçti!" : "Kaybettin! Bir dahaki sefere daha iyisini yap.");
+  location.reload();
+}
+</script>
 </body>
 </html>
