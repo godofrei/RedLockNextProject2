@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Red Lock - Sezon 2</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Arial Black', sans-serif;
+      background-color: #0a0a0a;
+      overflow: hidden;
+    }
+
+    .background {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, #1a0000, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .effect {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255, 0, 0, 0.1),
+        rgba(255, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 20px
+      );
+      opacity: 0.2;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.4; }
+    }
+
+    .content {
+      z-index: 1;
+      text-align: center;
+      color: white;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      background-color: red;
+      border: none;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    .btn:hover {
+      background-color: darkred;
+    }
+
+    .btn[disabled] {
+      background-color: #400000;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <div class="effect"></div>
+    <div class="content">
+      <h1>RED LOCK - SEZON 2</h1>
+      <p class="subtitle">“Artık sistem yok. Kuralları yazma sırası sende.”</p>
+      <div class="buttons">
+        <button class="btn" disabled>Teste Başla</button>
+        <a href="bolum1s2.html" class="btn">Okumaya Başla</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
