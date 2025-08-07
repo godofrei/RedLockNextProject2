@@ -1,133 +1,535 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<title>Red Lock Kapak & Mini Oyun</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Red Lock — 1v1 Mini Oyun</title>
 <style>
-  body { margin: 0; font-family: Arial, sans-serif; background: black; color: white; text-align: center; }
-  h1 { color: crimson; margin-top: 50px; }
-  .button { padding: 1rem 2rem; margin: 1rem; font-size: 1.2rem; background: crimson; border: none; color: white; cursor: pointer; }
-  #gameCanvas { background: linear-gradient(green, darkgreen); display: none; margin: auto; }
-  #timer, #score { font-size: 1.2rem; margin: 0.5rem; }
-  .hidden { display: none; }
+  :root{
+    --bg:#071013; --accent:crimson; --panel:#0d1113;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif}
+  .center{display:flex;align-items:center;justify-content:center;flex-direction:column}
+  header{padding:28px 16px 8px;text-align:center}
+  h1{font-size:28px;margin:0;color:var(--accent);letter-spacing:1px}
+  p.slogan{margin:8px 0 18px;font-weight:600;color:#ddd;font-size:14px}
+  .btn{background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:700;cursor:pointer;margin:6px}
+  .btn:active{transform:translateY(1px)}
+  /* layout */
+  #app{max-width:1100px;margin:0 auto;padding:12px}
+  #cover{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  /* canvas area */
+  #gameArea{display:none;flex-direction:column;align-items:center;gap:8px;padding:12px}
+  #hud{display:flex;gap:18px;align-items:center;justify-content:center;margin-bottom:6px}
+  #score,#timer{background:rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;font-weight:700}
+  #canvasWrap{position:relative;width:100%;max-width:900px}
+  canvas{width:100%;height:auto;display:block;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.6);background:#4a8c3a}
+  /* mobile controls */
+  .mobileControls{display:none;position:relative;margin-top:10px;width:100%;max-width:900px;justify-content:space-between}
+  .dPad{display:flex;gap:6px;align-items:center}
+  .dPad button, .shootBtn{background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.06);color:#fff;padding:14px;border-radius:10px;font-weight:700}
+  .shootBtn{background:var(--accent);border:none;padding:14px 18px;border-radius:12px}
+  /* character select modal */
+  #charPanel{display:none;position:fixed;inset:0;background:rgba(2,6,8,0.7);align-items:center;justify-content:center}
+  .panel{background:#071418;padding:18px;border-radius:12px;min-width:320px;max-width:420px}
+  .chars{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+  .charCard{background:#0c1416;padding:10px;border-radius:10px;width:100px;cursor:pointer;border:2px solid transparent}
+  .charCard.active{border-color:var(--accent)}
+  .charName{margin-top:8px;text-align:center;font-weight:700}
+  /* result overlay */
+  #resultOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center}
+  .resultBox{background:#081015;padding:20px;border-radius:10px;text-align:center}
+  @media (max-width:700px){
+    h1{font-size:22px}
+    .mobileControls{display:flex}
+  }
 </style>
 </head>
 <body>
+<div id="app">
+  <header class="center">
+    <h1>RED LOCK'A HOŞGELDİNİZ</h1>
+    <p class="slogan">"EGOİST OLMAK SADECE KENDİNİ BEĞENMİŞLİK DEĞİLDİR"</p>
+  </header>
 
-<!-- Kapak ekranı -->
-<div id="kapakEkrani">
-  <h1>RED LOCK'A HOŞGELDİNİZ</h1>
-  <p>"EGOİST OLMAK SADECE KENDİNİ BEĞENMİŞLİK DEĞİLDİR"</p>
-  <button class="button" onclick="alert('Okuma sayfasına gidecek!')">Okumaya Başla</button>
-  <button class="button" onclick="baslaKarakterSecimi()">Mini Oyun Oyna</button>
+  <!-- COVER -->
+  <section id="cover" class="center">
+    <button class="btn" id="readBtn">Okumaya Başla</button>
+    <button class="btn" id="playBtn">Mini Oyun Oyna</button>
+  </section>
+
+  <!-- GAME AREA -->
+  <section id="gameArea" class="center">
+    <div id="hud">
+      <div id="score">Goller: 0 / 10</div>
+      <div id="timer">Süre: 1:30</div>
+    </div>
+
+    <div id="canvasWrap">
+      <canvas id="gameCanvas" width="960" height="600"></canvas>
+    </div>
+
+    <!-- mobile controls -->
+    <div class="mobileControls">
+      <div class="dPad">
+        <div>
+          <button id="upBtn">▲</button>
+        </div>
+        <div style="display:flex;flex-direction:row;gap:6px">
+          <button id="leftBtn">◀</button>
+          <button id="downBtn">▼</button>
+          <button id="rightBtn">▶</button>
+        </div>
+      </div>
+      <div>
+        <button class="shootBtn" id="shootBtn">Şut</button>
+      </div>
+    </div>
+  </section>
 </div>
 
-<!-- Karakter seçimi -->
-<div id="karakterSecimi" class="hidden">
-  <h2>Karakterini Seç</h2>
-  <button class="button" onclick="oyunuBaslat('Rei','blue')">Rei</button>
-  <button class="button" onclick="oyunuBaslat('Nagi','yellow')">Nagi</button>
-  <button class="button" onclick="oyunuBaslat('Bachira','orange')">Bachira</button>
-  <button class="button" onclick="oyunuBaslat('Rin','purple')">Rin</button>
+<!-- character modal -->
+<div id="charPanel" class="center">
+  <div class="panel">
+    <h3>Karakter Seç — Kendi Takımını Seç</h3>
+    <div class="chars" id="chars"></div>
+    <div style="text-align:center;margin-top:12px">
+      <button class="btn" id="startMatch">Maça Başla</button>
+    </div>
+  </div>
 </div>
 
-<!-- Oyun -->
-<canvas id="gameCanvas" width="800" height="500"></canvas>
-<div id="hud" class="hidden">
-  <span id="timer">Süre: 1:30</span> | <span id="score">Goller: 0</span>
+<!-- result overlay -->
+<div id="resultOverlay" class="center">
+  <div class="resultBox">
+    <h2 id="resultTitle">Sonuç</h2>
+    <p id="resultText"></p>
+    <div style="margin-top:12px">
+      <button class="btn" id="replayBtn">Tekrar Oyna</button>
+      <button class="btn" id="backBtn">Ana Sayfaya Dön</button>
+    </div>
+  </div>
 </div>
 
 <script>
-let ctx, canvas, player, ball, opponent, keys = {}, score = 0, timeLeft = 90, gameInterval;
+/* =========================
+   Oyun: responsive canvas,
+   PC + Mobil kontroller,
+   orta grafikli çizimler
+   ========================= */
 
-function baslaKarakterSecimi(){
-  document.getElementById("kapakEkrani").classList.add("hidden");
-  document.getElementById("karakterSecimi").classList.remove("hidden");
+const cover = document.getElementById('cover');
+const playBtn = document.getElementById('playBtn');
+const charPanel = document.getElementById('charPanel');
+const charsWrap = document.getElementById('chars');
+const startMatchBtn = document.getElementById('startMatch');
+const gameArea = document.getElementById('gameArea');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const resultOverlay = document.getElementById('resultOverlay');
+const resultTitle = document.getElementById('resultTitle');
+const resultText = document.getElementById('resultText');
+const replayBtn = document.getElementById('replayBtn');
+const backBtn = document.getElementById('backBtn');
+
+let DPR = window.devicePixelRatio || 1;
+function resizeCanvas(){
+  const wrapW = Math.min(window.innerWidth - 24, 1000);
+  const ratio = 16/10;
+  const w = wrapW;
+  const h = Math.round(w/ratio);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = Math.round(w * DPR);
+  canvas.height = Math.round(h * DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
 }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-function oyunuBaslat(karakterAdi, renk){
-  document.getElementById("karakterSecimi").classList.add("hidden");
-  document.getElementById("gameCanvas").style.display = "block";
-  document.getElementById("hud").classList.remove("hidden");
-  
-  canvas = document.getElementById("gameCanvas");
-  ctx = canvas.getContext("2d");
-  
-  player = { x: 100, y: 200, size: 20, color: renk, name: karakterAdi };
-  ball = { x: 120, y: 220, size: 10, dx: 0, dy: 0 };
-  opponent = { x: 650, y: 200, size: 20, color: "red", name: "Isagi" };
-  
-  score = 0; timeLeft = 90;
-  
-  document.addEventListener("keydown", e => keys[e.key] = true);
-  document.addEventListener("keyup", e => keys[e.key] = false);
-  
-  gameInterval = setInterval(update, 1000/60);
-  setInterval(()=>{ 
-    if(timeLeft > 0) timeLeft--; 
-    else endGame(false);
-  }, 1000);
-}
+/* Karakter tanımı (basit sprite parametreleri) */
+const characters = [
+  { id:'Rei', color:'#1E90FF', power:1.6, accuracy:0.85 },
+  { id:'Nagi', color:'#FFD24D', power:1.35, accuracy:0.78 },
+  { id:'Bachira', color:'#FF7A2E', power:1.5, accuracy:0.80 },
+  { id:'Rin', color:'#9B59B6', power:1.3, accuracy:0.88 },
+];
+const opponent = { id:'Isagi', color:'#E33A3A', agility:2.2 };
 
-function update(){
-  // Hareket
-  if(keys["w"]) player.y -= 3;
-  if(keys["s"]) player.y += 3;
-  if(keys["a"]) player.x -= 3;
-  if(keys["d"]) player.x += 3;
-  
-  // Şut
-  if(keys[" "]) { ball.dx = 5; ball.dy = 0; }
-  
-  // Top hareketi
-  ball.x += ball.dx;
-  ball.y += ball.dy;
-  
-  // Top sınırdan çıkarsa reset
-  if(ball.x > canvas.width){
-    score++;
-    if(score >= 10) endGame(true);
-    ball = { x: player.x+20, y: player.y, size: 10, dx: 0, dy: 0 };
+/* oyun durumu */
+let playerChar = characters[0];
+let state = 'cover'; // cover, select, playing, ended
+let keys = {};
+let isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+/* oyun nesneleri (logical coords) */
+let field = { w: 1600, h: 1000 }; // logical field, scaled to canvas
+let scale = 1;
+
+let player = {}, keeper = {}, ball = {};
+let goals = 0, timeLeft = 90;
+let gameLoopId = null;
+let timerInterval = null;
+
+/* Basit helper */
+function rnd(min,max){ return Math.random()*(max-min)+min; }
+
+/* Render stadyum (orta grafik) */
+function drawStadium(){
+  // grass background (striped)
+  const g = ctx.createLinearGradient(0,0,canvas.width,0);
+  g.addColorStop(0,'#3f8b2f'); g.addColorStop(1,'#2c6b20');
+  ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // stripes
+  const stripeW = 50*scale;
+  ctx.globalAlpha = 0.08;
+  for(let x=0;x<canvas.width;x+=stripeW*2){
+    ctx.fillStyle = '#4aa13a'; ctx.fillRect(x,0,stripeW*1.1,canvas.height);
   }
-  
-  // Rakip otomatik hareket
-  if(opponent.y < ball.y) opponent.y += 2;
-  if(opponent.y > ball.y) opponent.y -= 2;
-  
-  // Rakip topu keserse
-  if(collision(ball, opponent)){
-    ball.dx = -3;
-  }
-  
-  // Çizimler
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = player.color;
-  ctx.fillRect(player.x, player.y, player.size, player.size);
-  
-  ctx.fillStyle = opponent.color;
-  ctx.fillRect(opponent.x, opponent.y, opponent.size, opponent.size);
-  
-  ctx.fillStyle = "white";
+  ctx.globalAlpha = 1;
+
+  // field lines
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  const pad = 40*scale;
+  ctx.strokeRect(pad,pad,canvas.width-2*pad,canvas.height-2*pad);
+
+  // center circle
   ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI*2);
+  ctx.arc(canvas.width/2, canvas.height/2, 90*scale, 0, Math.PI*2);
+  ctx.stroke();
+
+  // penalty area (right side goal)
+  const gw = 140*scale, gh = 220*scale;
+  const gx = canvas.width - pad - gw, gy = (canvas.height - gh)/2;
+  ctx.strokeRect(gx, gy, gw, gh);
+
+  // goal posts (simple)
+  ctx.fillStyle = '#ddd';
+  ctx.fillRect(canvas.width - pad - 8*scale, canvas.height/2 - 40*scale, 8*scale, 80*scale);
+}
+
+/* translate logical positions to canvas */
+function toCanvasX(x){ return (x/field.w) * canvas.width; }
+function toCanvasY(y){ return (y/field.h) * canvas.height; }
+
+/* draw player sprite (simple) */
+function drawPlayer(obj){
+  const x = toCanvasX(obj.x), y = toCanvasY(obj.y);
+  const size = 36*scale;
+  // body
+  ctx.fillStyle = obj.color;
+  roundRect(ctx, x-size/2, y-size/2, size, size, 8*scale, true, false);
+  // head
+  ctx.fillStyle = '#f6d3b7';
+  ctx.beginPath(); ctx.arc(x, y - size*0.5, size*0.35, 0, Math.PI*2); ctx.fill();
+  // number
+  ctx.fillStyle = '#fff'; ctx.font = `${12*scale}px Arial`; ctx.textAlign='center'; ctx.fillText(obj.name?obj.name[0]:'P', x, y+4*scale);
+}
+
+/* draw opponent keeper */
+function drawKeeper(obj){
+  const x = toCanvasX(obj.x), y = toCanvasY(obj.y);
+  const w = 36*scale, h = 36*scale;
+  roundRect(ctx, x-w/2, y-h/2, w, h, 8*scale, true, false);
+  // face
+  ctx.fillStyle = '#f6d3b7'; ctx.beginPath(); ctx.arc(x, y - h*0.35, h*0.32, 0, Math.PI*2); ctx.fill();
+}
+
+/* draw ball */
+function drawBall(){
+  const x = toCanvasX(ball.x), y = toCanvasY(ball.y);
+  ctx.beginPath();
+  ctx.fillStyle = 'white';
+  ctx.arc(x,y,8*scale,0,Math.PI*2);
   ctx.fill();
-  
-  document.getElementById("score").innerText = "Goller: " + score;
-  document.getElementById("timer").innerText = "Süre: " + Math.floor(timeLeft/60) + ":" + (timeLeft%60).toString().padStart(2,"0");
+  // markings
+  ctx.strokeStyle = '#222'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(x,y,6*scale,0,Math.PI); ctx.stroke();
 }
 
-function collision(obj1, obj2){
-  return obj1.x < obj2.x + obj2.size &&
-         obj1.x + obj1.size > obj2.x &&
-         obj1.y < obj2.y + obj2.size &&
-         obj1.y + obj1.size > obj2.y;
+/* rounded rect helper */
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+  if (typeof stroke == 'undefined'){ stroke = true; }
+  if (typeof r === 'undefined'){ r=5; }
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill===true? '#fff':fill; ctx.fill();}
+  if(stroke){ctx.strokeStyle = stroke===true? '#000':stroke; ctx.stroke();}
 }
 
-function endGame(win){
-  clearInterval(gameInterval);
-  alert(win ? "Kazandın! Red Lock seni seçti!" : "Kaybettin! Bir dahaki sefere daha iyisini yap.");
-  location.reload();
+/* initialize game objects */
+function initGame(){
+  // determine scale relative to canvas
+  scale = canvas.width / 960;
+  // player starting position (left)
+  player = { x: 150, y: field.h/2, vx:0, vy:0, speed: 6, color: playerChar.color, name: playerChar.id };
+  // opponent (Isagi) as keeper near right side
+  keeper = { x: field.w - 220, y: field.h/2, vx:0, vy:0, speed: 4, color: opponent.color, name: opponent.id };
+  // ball near player
+  ball = { x: player.x + 60, y: player.y, vx:0, vy:0, radius: 10, inMotion:false };
+  goals = 0; timeLeft = 90;
+  scoreEl.textContent = `Goller: ${goals} / 10`;
+  timerEl.textContent = `Süre: 1:30`;
 }
-</script>
-</body>
-</html>
+
+/* controls */
+window.addEventListener('keydown',(e)=>{ keys[e.key.toLowerCase()] = true; if(e.key===' '){ e.preventDefault(); }});
+window.addEventListener('keyup',(e)=>{ keys[e.key.toLowerCase()] = false; });
+
+/* mobile buttons */
+['upBtn','downBtn','leftBtn','rightBtn','shootBtn'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('touchstart', (ev)=>{ ev.preventDefault(); keys[id] = true; });
+  el.addEventListener('touchend', (ev)=>{ ev.preventDefault(); keys[id] = false; });
+  el.addEventListener('mousedown', ()=> keys[id]=true);
+  el.addEventListener('mouseup', ()=> keys[id]=false);
+});
+
+/* shoot function: launches ball toward goal with power & accuracy based on character */
+function shoot(){
+  if(ball.inMotion) return;
+  // aim: towards right goal center with slight variation by accuracy
+  const goalCenter = { x: field.w - 60, y: field.h/2 };
+  const dx = goalCenter.x - ball.x;
+  const dy = goalCenter.y - ball.y;
+  const dist = Math.hypot(dx,dy);
+  const normX = dx/dist, normY = dy/dist;
+  const power = 12 * playerChar.power; // adjust
+  // add randomness inversely proportional to accuracy
+  const spread = (1 - playerChar.accuracy) * 140; // more spread for low accuracy
+  const rx = rnd(-spread, spread);
+  const ry = rnd(-spread*0.4, spread*0.4);
+  ball.vx = normX * power + rx/20;
+  ball.vy = normY * power + ry/20;
+  ball.inMotion = true;
+}
+
+/* AI keeper behavior: intercept ball if in zone */
+function keeperBehavior(){
+  // if ball heading to goal zone, rush; else position centrally
+  const goalLine = field.w - 100;
+  if(ball.inMotion && ball.vx > 0 && ball.x > field.w/2){
+    // move toward ball.y with speed scaled
+    if(Math.abs(keeper.y - ball.y) > 8) keeper.y += Math.sign(ball.y - keeper.y) * keeperSpeed();
+  } else {
+    // slowly go to center
+    if(Math.abs(keeper.y - field.h/2) > 4) keeper.y += Math.sign(field.h/2 - keeper.y) * keeperSpeed()*0.6;
+  }
+}
+
+/* keeper speed (slightly random/agile) */
+function keeperSpeed(){ return  (opponent.agility + rnd(-0.6,0.6)) * 0.9; }
+
+/* update physics + game loop */
+function step(){
+  // handle input movement (WASD or arrow or mobile)
+  let inputY=0, inputX=0;
+  if(keys['w']||keys['arrowup']||keys['upBtn']) inputY -= 1;
+  if(keys['s']||keys['arrowdown']||keys['downBtn']) inputY += 1;
+  if(keys['a']||keys['arrowleft']||keys['leftBtn']) inputX -= 1;
+  if(keys['d']||keys['arrowright']||keys['rightBtn']) inputX += 1;
+  // normalize
+  if(inputX!==0 || inputY!==0){
+    const len = Math.hypot(inputX,inputY)||1;
+    player.x += (inputX/len) * player.speed * 1.1;
+    player.y += (inputY/len) * player.speed * 1.1;
+  }
+  // bounds
+  player.x = Math.max(60, Math.min(field.w - 300, player.x));
+  player.y = Math.max(80, Math.min(field.h - 80, player.y));
+
+  // move ball with player if not shot and near player
+  if(!ball.inMotion){
+    const distToPlayer = Math.hypot(ball.x - (player.x+60), ball.y - player.y);
+    // snap ball to slightly in front of player
+    ball.x = player.x + 60;
+    ball.y = player.y;
+  } else {
+    // ball motion
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+    // friction/air drag
+    ball.vx *= 0.995; ball.vy *= 0.995;
+  }
+
+  // keeper behavior
+  keeperBehavior();
+
+  // keeper intercepts ball: if near keeper when ball crossing keeper area
+  if(ball.inMotion){
+    const distK = Math.hypot(keeper.x - ball.x, keeper.y - ball.y);
+    if(distK < 60){
+      // chance to block depends on proximity and opponent agility
+      const chance = 0.5 + (opponent.agility - 2)/6; // base ~0.5
+      if(Math.random() < chance){
+        // deflect ball: reverse vx and add random
+        ball.vx = -ball.vx * (0.4 + Math.random()*0.3);
+        ball.vy += rnd(-2,2);
+        // small bounce: place ball a bit away
+        ball.x = keeper.x - 40;
+        ball.inMotion = true;
+      }
+    }
+  }
+
+  // detect goal: crosses line at right in goal area
+  const goalTop = field.h/2 - (110);
+  const goalBottom = field.h/2 + (110);
+  if(ball.inMotion && ball.x > field.w - 100){
+    if(ball.y > goalTop && ball.y < goalBottom){
+      // ball inside vertical goal area. Check if passed beyond post line
+      if(ball.x > field.w - 40){
+        // if keeper near and blocked earlier it would have reversed; otherwise goal
+        // small chance keeper still dives: compute based on distance
+        const kDist = Math.hypot(keeper.x - ball.x, keeper.y - ball.y);
+        if(kDist > 80){
+          // goal
+          goals++;
+          scoreEl.textContent = `Goller: ${goals} / 10`;
+          // reset ball
+          ball.inMotion = false; ball.vx=0; ball.vy=0;
+          ball.x = player.x + 60; ball.y = player.y;
+          // small celebration effect (we'll flash)
+          flash('#6bee8a');
+          if(goals>=10){ endMatch(true); }
+        } else {
+          // keeper close enough, block logic above should have triggered; but just deflect
+          ball.vx = -Math.abs(ball.vx)*0.4; ball.vy += rnd(-3,3);
+        }
+      }
+    } else {
+      // missed high or low; ball out: reset
+      if(ball.x > field.w - 10 || ball.y < 0 || ball.y > field.h){
+        ball.inMotion = false; ball.vx=0; ball.vy=0; ball.x = player.x+60; ball.y = player.y;
+      }
+    }
+  }
+
+  // bounds for ball
+  if(ball.y < 10) ball.y = 10, ball.vy *= -0.6;
+  if(ball.y > field.h - 10) ball.y = field.h - 10, ball.vy *= -0.6;
+
+  // update timer display scaled to canvas
+  drawFrame();
+}
+
+/* simple flash overlay on goal */
+let flashOverlay = { alpha:0, color:'#fff' };
+function flash(c){ flashOverlay.color = c; flashOverlay.alpha = 0.9; setTimeout(()=>{ flashOverlay.alpha = 0; }, 150);}
+
+/* transform and draw everything to canvas */
+function drawFrame(){
+  // clear
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // draw stadium scaled graphics
+  drawStadiumCanvas();
+  // player
+  drawPlayer(player);
+  // keeper
+  drawKeeper(keeper);
+  // ball
+  drawBall();
+  // HUD in canvas bottom-left small (optional)
+  // flash
+  if(flashOverlay.alpha>0){
+    ctx.fillStyle = flashOverlay.color;
+    ctx.globalAlpha = flashOverlay.alpha;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.globalAlpha = 1;
+  }
+}
+
+/* draw stadium adapted to canvas (wrapper uses toCanvas helper) */
+function drawStadiumCanvas(){
+  // full background gradient
+  const g = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+  g.addColorStop(0, '#449f39'); g.addColorStop(1,'#2d7f24');
+  ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
+  // stripes
+  ctx.globalAlpha = 0.08;
+  const stripeW = 48*scale;
+  for(let x=0;x<canvas.width;x+=stripeW*2){ ctx.fillStyle='#5db94b'; ctx.fillRect(x,0,stripeW,canvas.height); }
+  ctx.globalAlpha = 1;
+  // boundaries
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth=2;
+  const pad = 40*scale;
+  ctx.strokeRect(pad,pad,canvas.width-2*pad,canvas.height-2*pad);
+  // center circle
+  ctx.beginPath(); ctx.arc(canvas.width/2, canvas.height/2, 90*scale,0,Math.PI*2); ctx.stroke();
+  // right penalty box + goal posts
+  const gw = 140*scale, gh = 220*scale;
+  const gx = canvas.width - pad - gw, gy = (canvas.height - gh)/2;
+  ctx.strokeRect(gx, gy, gw, gh);
+  // goal posts
+  ctx.fillStyle='#fff'; ctx.fillRect(canvas.width - pad - 6*scale, canvas.height/2 - 40*scale, 6*scale, 80*scale);
+}
+
+/* position transform from logical field to canvas */
+function toC(x){ return (x/field.w) * canvas.width; }
+function toY(y){ return (y/field.h) * canvas.height; }
+
+/* draw player on canvas using logical coords */
+function drawPlayer(o){
+  const cx = toC(o.x), cy = toY(o.y);
+  const size = 36*scale;
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(cx, cy+size*0.45, size*0.6, size*0.28, 0,0,Math.PI*2); ctx.fill();
+  // jersey
+  ctx.fillStyle = o.color;
+  roundRect(ctx, cx-size/2, cy-size/2, size, size, 8*scale, true, false);
+  // head
+  ctx.fillStyle='#f3d7bc'; ctx.beginPath(); ctx.arc(cx, cy - size*0.45, size*0.35, 0, Math.PI*2); ctx.fill();
+  // eyes simple
+  ctx.fillStyle='#222'; ctx.fillRect(cx - 6*scale, cy - size*0.5, 4*scale, 3*scale); ctx.fillRect(cx + 2*scale, cy - size*0.5, 4*scale, 3*scale);
+  // label
+  ctx.fillStyle='#fff'; ctx.font = `${12*scale}px Arial`; ctx.textAlign='center'; ctx.fillText(o.name || 'P', cx, cy + 6*scale);
+}
+
+/* draw keeper similar */
+function drawKeeper(k){
+  const cx = toC(k.x), cy = toY(k.y);
+  const size = 36*scale;
+  ctx.fillStyle=k.color;
+  roundRect(ctx, cx-size/2, cy-size/2, size, size, 8*scale, true, false);
+  ctx.fillStyle='#f3d7bc'; ctx.beginPath(); ctx.arc(cx, cy - size*0.45, size*0.35, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.font=`${12*scale}px Arial`; ctx.textAlign='center'; ctx.fillText(k.name[0], cx, cy+6*scale);
+}
+
+/* draw ball from logical coords */
+function drawBall(){
+  const cx = toC(ball.x), cy = toY(ball.y);
+  ctx.beginPath(); ctx.fillStyle = ball.color || '#fff'; ctx.arc(cx, cy, 8*scale, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.stroke();
+}
+
+/* game loop runner */
+function run(){
+  if(state!=='playing') return;
+  // update physical positions scaled to logical field
+  step();
+  // update HUD
+  scoreEl.textContent = `Goller: ${goals} / 10`;
+  const m = Math.floor(timeLeft/60), s = timeLeft%60;
+  timerEl.textContent = `Süre: ${m}:${s<10?'0':''}${s}`;
+  // request next frame
+  if(gameLoopId) cancelAnimationFrame(gameLoopId);
+  gameLoopId = requestAnimationFrame(run);
+}
+
+/* start a match after selecting character */
+function startMatch(){
+  state = 'playing';
+  initGame();
+  // begin timer tick
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(
