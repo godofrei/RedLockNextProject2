@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Lock - Kapak</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: black;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: red;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1.2rem;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 25px;
+        margin-top: 10px;
+        font-size: 1rem;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+    .btn:hover {
+        background-color: darkred;
+    }
+
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<h1>RED LOCK'A HOŞGELDİN</h1>
+<p>"Egoist olmak sadece kendini beğenmişlik değildir"</p>
+<a href="bolum1.html" class="btn">Okumaya Başla</a>
+
+<script>
+// Canvas ayarları
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+// Şimşek efekti
+function drawLightning() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (Math.random() > 0.96) { // Şimşeğin çakma sıklığı
+        let startX = Math.random() * canvas.width;
+        let startY = 0;
+        let segments = 10;
+        let x = startX;
+        let y = startY;
+
+        ctx.strokeStyle = "rgba(255,0,0,0.8)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        for (let i = 0; i < segments; i++) {
+            x += (Math.random() - 0.5) * 100;
+            y += canvas.height / segments;
+            ctx.lineTo(x, y);
+        }
+
+        ctx.stroke();
+    }
+    requestAnimationFrame(drawLightning);
+}
+
+drawLightning();
+</script>
+
+</body>
+</html>
