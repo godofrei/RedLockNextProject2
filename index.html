@@ -64,8 +64,10 @@
 <div class="content">
     <h1>RED LOCK'A HOŞGELDİN</h1>
     <p>"EGOİST OLMAK SADECE KENDİNİ BEĞENMEK DEĞİLDİR"</p>
-    <button class="btn" onclick="location.href='hikaye_1.html'">Okumaya Başla</button>
+    <button class="btn" onclick="startReading()">Okumaya Başla</button>
 </div>
+
+<audio id="thunderSound" src="thunder.mp3" preload="auto"></audio>
 
 <script>
     const canvas = document.getElementById('lightningCanvas');
@@ -80,6 +82,9 @@
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
+
+    const thunderSound = document.getElementById("thunderSound");
+    let soundEnabled = false;
 
     function drawLightning() {
         ctx.clearRect(0, 0, width, height);
@@ -102,9 +107,20 @@
             ctx.shadowColor = "red";
             ctx.stroke();
         }
+
+        // Ses efekti
+        if (soundEnabled && Math.random() > 0.7) {
+            thunderSound.currentTime = 0;
+            thunderSound.play().catch(()=>{});
+        }
     }
 
     setInterval(drawLightning, 150);
+
+    function startReading() {
+        soundEnabled = true;
+        window.location.href = "hikaye_1.html";
+    }
 </script>
 
 </body>
