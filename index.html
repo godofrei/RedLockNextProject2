@@ -2,73 +2,47 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Red Lock</title>
+  <title>RED LOCK - Yeni Proje</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
       background: black;
       color: white;
       font-family: Arial, sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-image: radial-gradient(circle at center, black 60%, crimson 100%);
-      animation: lightning 2s infinite;
+      text-align: center;
+      padding-top: 20vh;
     }
-
-    @keyframes lightning {
-      0%, 100% { background-color: black; }
-      50% { background-color: crimson; }
-    }
-
     h1 {
       font-size: 3rem;
       font-weight: bold;
       color: white;
-      text-align: center;
+      text-shadow: 0 0 20px crimson;
     }
-
-    h2 {
-      font-size: 1.5rem;
+    p {
+      font-size: 1.2rem;
       font-style: italic;
       color: white;
-      text-align: center;
-      margin-top: 1rem;
+      margin-bottom: 3rem;
     }
-
-    .buttons {
-      margin-top: 2rem;
-      display: flex;
-      gap: 1rem;
-    }
-
-    .buttons a {
+    .btn {
       background-color: crimson;
       color: white;
-      text-decoration: none;
+      border: none;
       padding: 1rem 2rem;
       font-size: 1rem;
-      font-weight: bold;
-      border-radius: 5px;
+      cursor: pointer;
+      margin: 0.5rem;
       transition: background 0.3s;
     }
-
-    .buttons a:hover {
+    .btn:hover {
       background-color: darkred;
     }
   </style>
 </head>
 <body>
   <h1>RED LOCK'A HOŞ GELDİNİZ</h1>
-  <h2>\"Egoist olmak sadece kendini beğenmek değildir.\"</h2>
-
-  <div class="buttons">
-    <a href="karaktersin.html">Teste Başla</a>
-    <a href="bolum1.html">Okumaya Başla</a>
-  </div>
+  <p><strong>"Egoist olmak sadece kendini beğenmek değildir."</strong></p>
+  
+  <!-- Sadece okuma butonu kaldı -->
+  <button class="btn" onclick="location.href='bolum1.html'">Okumaya Başla</button>
 </body>
 </html>
